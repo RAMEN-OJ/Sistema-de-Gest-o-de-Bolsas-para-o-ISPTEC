@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plataforma de Bolsas – Protótipo</title>
+<style>
+:root{--or:#F26B21;--or2:#d85a14;--gr:#3d4148;--bg:#f3f4f6;--card:#fff;--tx:#23262b;--mut:#6b7280;--bd:#e2e4e8;--ok:#0f9d58;--bad:#d93025;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191d;--card:#22252b;--tx:#eceef1;--mut:#9aa1ac;--bd:#33373f;--gr:#2b2e34;--or:#ff8040;--or2:#ff9a66;--ok:#4cc38a;--bad:#ff7b72}}
+:root[data-theme="dark"]{--bg:#17191d;--card:#22252b;--tx:#eceef1;--mut:#9aa1ac;--bd:#33373f;--gr:#2b2e34;--or:#ff8040;--or2:#ff9a66;--ok:#4cc38a;--bad:#ff7b72}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+header{background:var(--gr);color:#fff;border-bottom:4px solid var(--or)}
+.nav{max-width:960px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:.5px;margin-right:auto}.logo b{color:var(--or)}
+.nav a{color:#fff;opacity:.85;text-decoration:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.92rem}
+.nav a:hover,.nav a.on{opacity:1;background:rgba(255,255,255,.14)}
+main{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.5rem;margin:0 0 4px}h2{font-size:1.1rem;margin:0 0 10px}
+.sub{color:var(--mut);margin:0 0 18px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.card.hv{border-top:4px solid var(--or)}
+.tag{display:inline-block;background:rgba(242,107,33,.14);color:var(--or2);border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-bottom:8px}
+.mut{color:var(--mut);font-size:.9rem}
+label{display:block;font-size:.82rem;color:var(--mut);margin:12px 0 4px}
+input,textarea{width:100%;padding:11px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+input:focus,textarea:focus{outline:2px solid var(--or);border-color:transparent}
+.btn{background:var(--or);color:#fff;border:0;border-radius:8px;padding:11px 16px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--or2)}
+.btn.s{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.btn.d{background:transparent;color:var(--bad);border:1px solid var(--bad);padding:5px 10px;font-size:.82rem}
+.full{width:100%;margin-top:16px}
+.auth{max-width:400px;margin:30px auto}
+.msg{margin-top:12px;font-size:.9rem;min-height:1.2em}.msg.e{color:var(--bad)}.msg.o{color:var(--ok)}
+.demo{background:rgba(242,107,33,.1);border:1px dashed var(--or);border-radius:8px;padding:10px;font-size:.82rem;margin-top:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat b{display:block;font-size:1.8rem;color:var(--or)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:9px;border-bottom:1px solid var(--bd);white-space:nowrap}th{color:var(--mut)}
+.center{text-align:center;padding:50px 0}.center .big{font-size:4rem;color:var(--or);font-weight:800}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.back{background:none;border:0;color:var(--or2);cursor:pointer;padding:0;margin-bottom:12px;font:inherit}
+</style>
+</head>
+<body>
+<header><div class="nav" id="nav"></div></header>
+<main id="app"></main>
+
+<script>
+var $ = function(s){return document.querySelector(s)};
+var esc = function(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+
+// ---- "API" simulada (troca por fetch quando houver backend) ----
+// ---- dados.js (colado aqui; no projeto real é o ficheiro dados.js) ----
+var DESC = "Esta bolsa é interna, tem um subsídio de 58mil kzs é elegível para pessoas dos 18 aos 22 anos de idade";
+var bolsas = [
+  {id:1,titulo:"Bolsa Interna Inagbe",pais:"Angola",descricao:DESC,idadeMax:22},
+  {id:2,titulo:"Bolsa Externa Inagbe",pais:"Portugal",descricao:DESC,idadeMax:22},
+  {id:3,titulo:"Bolsa Externa Inagbe",pais:"Hungria",descricao:DESC,idadeMax:22},
+  {id:4,titulo:"Bolsa Externa Inagbe",pais:"Itália",descricao:DESC,idadeMax:22},
+  {id:5,titulo:"Bolsa Externa Inagbe",pais:"Brasil",descricao:DESC,idadeMax:22},
+  {id:6,titulo:"Bolsa Externa Inagbe",pais:"África do Sul",descricao:DESC,idadeMax:22},
+  {id:7,titulo:"Bolsa Externa Inagbe",pais:"Namíbia",descricao:DESC,idadeMax:22}
+];
+var usuarios = [
+  {id:1,nome:"Marta",email:"marta@teste.co",senha:"1234",dataNascimento:"12/03/2003",tipo:"admin"},
+  {id:2,nome:"Abílio",email:"abilio@teste.co",senha:"12345",dataNascimento:"12/03/2003",tipo:"aluno"},
+  {id:3,nome:"Rui",email:"rui@teste.co",senha:"3212",dataNascimento:"12/03/2003",tipo:"aluno"}
+];
+var mentorias = [
+  {id:1,mentor:"Dr. João",tipoBolsa:"externa",contacto:"992992992",preco:"5000 kzs"}
+];
+
+// ---- api.js (as mesmas funções, corrigidas) ----
+function semSenha(u){ var c = Object.assign({}, u); delete c.senha; return c; }
+var Api = {
+  login:function(email,senha){
+    var u = usuarios.find(function(x){return x.email===email && String(x.senha)===String(senha)});
+    return u ? {sucesso:true,usuario:semSenha(u)} : {erro:"Email ou senha errada"};
+  },
+  cadastro:function(nome,email,senha,dataNascimento){
+    if (usuarios.some(function(x){return x.email===email})) return {erro:"Este utilizador já existe"};
+    var n = {id:Date.now(),nome:nome,email:email,senha:senha,dataNascimento:dataNascimento,tipo:"aluno"};
+    usuarios.push(n); return {sucesso:true,usuario:semSenha(n)};
+  },
+  criarBolsa:function(titulo,pais,descricao,idadeMax){
+    var b = {id:Date.now(),titulo:titulo,pais:pais,descricao:descricao,idadeMax:idadeMax};
+    bolsas.push(b); return {sucesso:true,bolsa:b};
+  },
+  removerBolsa:function(id){ bolsas = bolsas.filter(function(b){return b.id!==id}); return {sucesso:true}; },
+  listarUsuario:function(){ return usuarios.map(semSenha); },
+  listarBolsas:function(){ return bolsas.slice(); },
+  bolsaPorId:function(id){ return bolsas.find(function(b){return b.id===id}); },
+  listarMentorias:function(){ return mentorias.slice(); }
+};
+function nomeDe(u){ return u.nome || u.email; }
+
+// ---- Estado e navegação ----
+var user = null, rota = "login", param = null;
+var adminRoutes = ["admin","admin-bolsas"];
+var userRoutes = ["bolsas","detalhes","mentorias","perfil"];
+
+function go(r,p){
+  if (adminRoutes.indexOf(r)>-1){
+    if (!user) r = "login"; else if (user.tipo!=="admin") r = "negado";
+  } else if (userRoutes.indexOf(r)>-1 && !user) r = "login";
+  rota = r; param = p || null; render();
+}
+function destino(u){ return u.tipo==="admin" ? "admin" : "bolsas"; }
+
+function renderNav(){
+  var n = $("#nav");
+  var h = '<span class="logo">ISP<b>TEC</b> · Bolsas</span>';
+  if (user){
+    var links = user.tipo==="admin"
+      ? [["admin","Painel"],["admin-bolsas","Gerir bolsas"]]
+      : [["bolsas","Bolsas"],["mentorias","Mentorias"],["perfil","Perfil"]];
+    links.forEach(function(l){ h += '<a data-r="'+l[0]+'" class="'+(rota===l[0]?"on":"")+'">'+l[1]+'</a>'; });
+    h += '<a data-r="sair">Sair</a>';
+  }
+  n.innerHTML = h;
+  n.querySelectorAll("a").forEach(function(a){
+    a.onclick = function(){ var r = a.dataset.r; if (r==="sair"){ user=null; go("login"); } else go(r); };
+  });
+}
+
+function bolsaCard(b){
+  return '<div class="card hv"><span class="tag">'+esc(b.pais)+'</span><h2>'+esc(b.titulo)+'</h2>'+
+    '<p class="mut">'+esc(b.descricao.slice(0,80))+'…</p><p class="mut">Idade máxima: '+b.idadeMax+'</p>'+
+    '<button class="btn" data-id="'+b.id+'">Ver detalhes</button></div>';
+}
+
+var telas = {
+  login:function(){
+    return '<div class="card auth"><h1>Entrar</h1><p class="sub">Acede à plataforma de bolsas.</p>'+
+    '<label>Email</label><input id="em" type="email" autocomplete="username">'+
+    '<label>Senha</label><input id="se" type="password" autocomplete="current-password">'+
+    '<button class="btn full" id="ok">Entrar</button><div class="msg e" id="m" role="alert"></div>'+
+    '<p class="mut" style="text-align:center">Sem conta? <a href="#" id="cad" style="color:var(--or2)">Criar conta</a></p>'+
+    '<div class="demo"><b>Contas de teste</b><br>Admin: marta@teste.co / 1234<br>Aluno: abilio@teste.co / 12345</div></div>';
+  },
+  cadastro:function(){
+    return '<div class="card auth"><h1>Criar conta</h1><p class="sub">Só contas comuns. Nunca há opção de admin.</p>'+
+    '<label>Nome</label><input id="no"><label>Email</label><input id="em" type="email">'+
+    '<label>Senha</label><input id="se" type="password">'+
+    '<label>Data de nascimento</label><input id="dn" type="date">'+
+    '<button class="btn full" id="ok">Registar</button><div class="msg" id="m" role="alert"></div>'+
+    '<p class="mut" style="text-align:center"><a href="#" id="vol" style="color:var(--or2)">Voltar ao login</a></p></div>';
+  },
+  bolsas:function(){
+    return '<h1>Bolsas disponíveis</h1><p class="sub">Escolhe uma bolsa para ver os detalhes.</p><div class="cards">'+
+      (bolsas.length ? bolsas.map(bolsaCard).join("") : '<p class="mut">Ainda não há bolsas.</p>')+'</div>';
+  },
+  detalhes:function(){
+    var b = bolsas.find(function(x){return x.id===param});
+    if (!b) return telas.naoencontrado();
+    return '<button class="back" id="vol">← Voltar</button><div class="card hv"><span class="tag">'+esc(b.pais)+'</span>'+
+      '<h1>'+esc(b.titulo)+'</h1><p>'+esc(b.descricao)+'</p><p class="mut">Idade máxima: '+b.idadeMax+' anos</p>'+
+      '<button class="btn" id="mt">Falar com um mentor</button></div>';
+  },
+  mentorias:function(){
+    return '<h1>Mentorias</h1><p class="sub">Mentores que te podem ajudar na candidatura.</p><div class="cards">'+
+      mentorias.map(function(m){return '<div class="card"><span class="tag">'+esc(m.tipoBolsa)+'</span><h2>'+esc(m.mentor)+'</h2>'+
+      '<p class="mut">'+esc(m.contacto)+'</p><b>'+esc(m.preco)+'</b></div>'}).join("")+'</div>';
+  },
+  perfil:function(){
+    return '<h1>O meu perfil</h1><div class="card" style="max-width:420px"><p><b>Nome:</b> '+esc(nomeDe(user))+'</p>'+
+      '<p><b>Email:</b> '+esc(user.email)+'</p><p><b>Tipo:</b> '+esc(user.tipo)+'</p><button class="btn s" id="sair">Terminar sessão</button></div>';
+  },
+  admin:function(){
+    return '<h1>Painel de administração</h1><p class="sub">Bem-vindo, '+esc(nomeDe(user))+'.</p><div class="stats">'+
+      '<div class="card stat"><b>'+bolsas.length+'</b>Bolsas</div><div class="card stat"><b>'+mentorias.length+'</b>Mentorias</div>'+
+      '<div class="card stat"><b>'+usuarios.length+'</b>Utilizadores</div></div>'+
+      '<button class="btn" id="gb">Gerir bolsas</button>';
+  },
+  "admin-bolsas":function(){
+    var rows = bolsas.map(function(b){return '<tr><td>'+esc(b.titulo)+'</td><td>'+esc(b.pais)+'</td><td>'+b.idadeMax+'</td>'+
+      '<td><button class="btn d" data-del="'+b.id+'">Remover</button></td></tr>'}).join("");
+    return '<h1>Gerir bolsas</h1><div class="card" style="margin-bottom:16px"><h2>Nova bolsa</h2>'+
+      '<div class="row"><div><label>Título</label><input id="t"></div><div><label>País</label><input id="p"></div>'+
+      '<div><label>Idade máx.</label><input id="i" type="number" min="1"></div></div>'+
+      '<label>Descrição</label><textarea id="d" rows="3"></textarea>'+
+      '<button class="btn" id="cr" style="margin-top:12px">Criar bolsa</button><div class="msg e" id="m" role="alert"></div></div>'+
+      '<div class="card tw"><table><thead><tr><th>Título</th><th>País</th><th>Idade</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  },
+  negado:function(){ return '<div class="center"><div class="big">403</div><h1>Acesso negado</h1><p class="sub">Não tens permissão para ver esta área.</p><button class="btn" id="home">Ir para o início</button></div>'; },
+  naoencontrado:function(){ return '<div class="center"><div class="big">404</div><h1>Página não encontrada</h1><button class="btn" id="home">Ir para o início</button></div>'; }
+};
+
+function ligar(){
+  var f = function(id,fn){ var e = document.getElementById(id); if (e) e.onclick = fn; };
+  f("cad",function(ev){ev.preventDefault(); go("cadastro")});
+  f("vol",function(ev){ev.preventDefault(); go(rota==="detalhes" ? "bolsas" : "login")});
+  f("home",function(){ go(user ? destino(user) : "login") });
+  f("sair",function(){ user=null; go("login") });
+  f("mt",function(){ go("mentorias") });
+  f("gb",function(){ go("admin-bolsas") });
+  f("ok",function(){
+    var m = $("#m");
+    if (rota==="login"){
+      var r = Api.login($("#em").value.trim(), $("#se").value);
+      if (r.erro){ m.textContent = r.erro; return; }
+      user = r.usuario; go(destino(user));      // admin → painel, aluno → bolsas
+    } else {
+      var nome = $("#no").value.trim(), em = $("#em").value.trim(), se = $("#se").value;
+      if (!nome || !em || se.length<4){ m.className="msg e"; m.textContent="Preenche tudo (senha com 4+ caracteres)."; return; }
+      var c = Api.cadastro(nome,em,se,$("#dn").value);
+      if (c.erro){ m.className="msg e"; m.textContent=c.erro; return; }
+      m.className="msg o"; m.textContent="Conta criada! Já podes entrar.";
+    }
+  });
+  f("cr",function(){
+    var t=$("#t").value.trim(), p=$("#p").value.trim(), i=parseInt($("#i").value,10), d=$("#d").value.trim();
+    if (!t||!p||!d||!i){ $("#m").textContent="Preenche todos os campos."; return; }
+    Api.criarBolsa(t,p,d,i); render();
+  });
+  document.querySelectorAll("[data-id]").forEach(function(b){ b.onclick = function(){ go("detalhes",parseInt(b.dataset.id,10)); }; });
+  document.querySelectorAll("[data-del]").forEach(function(b){
+    b.onclick = function(){ if (confirm("Remover esta bolsa?")){ Api.removerBolsa(parseInt(b.dataset.del,10)); render(); } };
+  });
+  document.querySelectorAll("input").forEach(function(i){ i.onkeydown = function(e){ if (e.key==="Enter" && document.getElementById("ok")) document.getElementById("ok").click(); }; });
+}
+
+function render(){
+  renderNav();
+  $("#app").innerHTML = (telas[rota] || telas.naoencontrado)();
+  ligar();
+}
+render();
+</script>
+</body>
+</html>
