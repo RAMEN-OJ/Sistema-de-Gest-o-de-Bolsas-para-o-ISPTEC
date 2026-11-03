@@ -1,0 +1,5 @@
+Coloca aqui a foto da capital/cidade de cada pais, em .jpg, com estes nomes:
+angola.jpg  portugal.jpg  hungria.jpg  italia.jpg  brasil.jpg  africa-do-sul.jpg  namibia.jpg
+(para uma bolsa nova: nome do pais em minusculas, sem acentos, espacos -> hifen. Ex.: franca.jpg, estados-unidos.jpg)
+Sem a foto, o slide mostra um fundo colorido com a bandeira.
+Tamanho recomendado: 1600x600.
